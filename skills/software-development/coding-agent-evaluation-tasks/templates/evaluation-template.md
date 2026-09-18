@@ -1,110 +1,137 @@
-Model Evaluation Template - Project C
+Model Evaluation Template - Project C Sprint
 
-Use one copy of this per task across both models.
-Fill in observations for each model side by side.
+One copy per task. Model A and Model B run in parallel from one identical
+snapshot, with the same auto-injected opening prompt.
 
-Task: <task title from pre-work>
+Task ID: <from Studio Task Setup>
 Repo: <github url>
 Interaction Mode: Interactive / Async
 Date: <date>
 
-Model A: <model name and version>
-Model B: <model name and version>
+Model A name:
+Model B name:
 
---- Setup Phase (before prompts sent)
+Setup Confirmed
 
-Repo cloned to model_a/ and model_b/ directories? Yes / No
-Start snapshots taken? Yes / No
-Setup script completed? Yes / No
+init.py run, Okta login done, repo cloned: Yes / No
+model_a/claude-dev and model_b/claude-dev both launched: Yes / No
+Animal code names confirmed on both, no /login used: Yes / No
+logs/model_a and logs/model_b present: Yes / No
 
---- Prompt Given (paste the exact prompt)
+Opening Prompt (auto-injected, identical for both)
 
-<same prompt given to both models>
+<paste the opening prompt here for reference>
 
---- Model A Observations
+Important: do not paste the success criteria or the task goal into either
+session. Prompt each model as a real user would. What you measure is how the
+model gets there, not how well it follows a spec you handed it.
 
-Total turns taken:
-Total time elapsed:
-Did the model complete the task? Yes / Partial / No
-If partial or no, where did it stop?
+Behavioral Issue Log (fill in real time while both models run)
 
-Turn by turn log:
+Copy this block per issue. Aim for accuracy, not volume.
 
-Turn 1:
-<what model A did, code changes, questions asked, tools used>
+Issue 1
+Model: A or B
+Issue type: <one of the 13 from the behavioural guide>
+Transcript quote: <verbatim>
+Description: <what happened, with context>
+Severity: Blocking / Major / Minor / Observation
 
-Turn 2:
-<same>
+Issue 2
+Model: A or B
+Issue type:
+Transcript quote:
+Description:
+Severity:
 
-Turn 3:
-<same>
+Issue 3
+Model: A or B
+Issue type:
+Transcript quote:
+Description:
+Severity:
 
-... continue for each turn
+(continue as needed)
 
-Key observations:
-<notable behaviors, decisions, approaches>
+Interaction Log
 
---- Model B Observations
+Model A turns:
+A1:
+A2:
+A3:
+A4:
+A5:
 
-Total turns taken:
-Total time elapsed:
-Did the model complete the task? Yes / Partial / No
-If partial or no, where did it stop?
+Model B turns:
+B1:
+B2:
+B3:
+B4:
+B5:
 
-Turn by turn log:
+Individual Ratings (do these FIRST, one score per model, no comparing)
 
-Turn 1:
-<what model B did, code changes, questions asked, tools used>
+Score 1-5. 1 poor, 5 excellent. Give written feedback with each score.
 
-Turn 2:
-<same>
+Task Success - how well did the agent complete the task you set out to do?
+  A:   B:   feedback:
+  (1 Failed completely / 2 Partial with major issues / 3 Completed with notable
+   problems / 4 Successful with minor issues / 5 Completely successful)
 
-Turn 3:
-<same>
+Instruction Following - followed instructions and intent without missing details?
+  A:   B:   feedback:
+  (1 Ignored repeatedly / 2 Missed important / 3 Followed most / 4 Followed
+   nearly all / 5 Perfect adherence)
 
-... continue for each turn
+Interaction Quality - avoided failure modes, or issues showed up?
+  A:   B:   feedback:
+  (1 Critical blocker / 2 Major, overcame with prompting / 3 Periodic issues /
+   4 Only noticeable on close attention / 5 No behavioral issues)
 
-Key observations:
-<notable behaviors, decisions, approaches>
+Code Quality - well written, maintainable, matches codebase style?
+  A:   B:   feedback:
+  (1 Critically bad / 2 Mediocre, inconsistent / 3 Adequate / 4 Good, in line
+   with codebase / 5 Excellent, indistinguishable from codebase)
 
---- Behavioral Comparison
+Thoroughness - understood and implemented with minimal hand-holding?
+  A:   B:   feedback:
+  (1 Failed most, constant input / 2 Failed many, frequent input / 3 Solved most,
+   occasional input / 4 Solved nearly all, minimal input / 5 Complete
+   understanding, no input needed)
+  For async: judge how well it handled ambiguity and decided autonomously.
 
-Check each behavior for both models. Mark Y, N, or NA.
+Communication Quality - how clearly did it communicate?
+  A:   B:   feedback:
+  (1 Cannot be understood / 2 Hard to follow / 3 Understandable with effort /
+   4 Clear on first read / 5 Clear, exact, to the point)
 
-Behavior                          Model A   Model B
----                               ---       ---
-Explored codebase before changes
-Asked clarifying questions
-Made assumptions without checking
-Wrote or updated tests
-Considered edge cases
-Handled errors gracefully
-Followed existing code conventions
-Reduced scope or cut corners
-Hallucinated API or function names
-Modified tests to make them pass
-Required steering/redirection
-Showed confidence vs uncertainty
+Head-to-Head Preference (0 to 7)
 
---- Outcome Comparison
+Model A anchors 0, Model B anchors 7. Write reasoning that cites specific
+evidence for each criterion. "A was better than B" is not enough.
 
-Category              Model A   Model B   Notes
----                   ---       ---       -----
-Solution correctness
-Code quality
-Testing thoroughness
-Exploration depth
-Communication clarity
-Time efficiency
-Overall (1-5)
+Scale: 0 strong A / 1-2 moderate A / 3-4 slight or tie / 5-6 moderate B / 7 strong B
 
---- Final Notes
+Overall Performance - which output did you prefer?
+  score:   reasoning:
 
-Which model performed better and why:
-<your assessment>
+Instruction Following - which followed instructions and intent more accurately?
+  score:   reasoning:
 
-What surprised you about either model:
-<unexpected behaviors, good or bad>
+Time to Resolution - which got to a working solution faster, less rework?
+  score:   reasoning:
 
-Anything to flag for the sprint review:
-<issues, patterns, concerns>
+Vibe - which was more pleasant to work with (tone, pacing, feedback handling)?
+  score:   reasoning:
+
+General Behavioral Insights (per model, always say which model)
+
+Model A:
+Model B:
+
+Time Spent
+
+Self-reported total (model runs plus feedback). Metadata only.
+
+Total time:
+

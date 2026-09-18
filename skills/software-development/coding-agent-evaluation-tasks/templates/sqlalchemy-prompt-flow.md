@@ -1,10 +1,40 @@
 Task: SQLAlchemy - asyncpg InternalClientError poisons the connection pool
 Repo: sqlalchemy/sqlalchemy (Python, 217 files)
 Max time: 150 minutes per model
-Note: the opening prompt is the approved pre-work prompt. It is auto-injected
-and is identical for both models. Only the follow-ups diverge.
 
---- TRACK A - Independent Problem Solving (Model A)
+Q1: Task Goal
+
+The goal of this task is for the models to trace, debug and resolve random pool timeout errors within the SQLAlchemy solution.
+The primary set of sucess criteria are:
+1\  accurately understand the codebase and context of observed errors (binary yes/no)
+2\ accurately simulate and trace observed pool timeout errors using asyncpg (binary yes/no)
+3\ fix error handling within InterfaceError without impactin existing error handling within the function (binary yes/no)
+4\ resulting fix results in >99% sucessful throughput of cases and <0.1% asyncpg.InternalClientError observed
+
+Q2: Why would frontier models struggle with this?
+
+Models should struglle with resolving this bug as it cuts across crosses four architectural layers... 1\ the asyncpg dialect error classification 2\ the engine exception handler 3\ the pool connection return path and 4\ the pre-ping validation. The models need to trace the multi-file path to understand that the  5% silent misclassification at the dialect layer eventually causes the global pool exhaustion.
+When PostgreSQL terminates a session mid-transaction, the asyncpg driver can raise InternalClientError instead of the expected InterfaceError. The dialect's is_disconnect() in lib/sqlalchemy/dialects/postgresql/asyncpg.py only checks connection.is_closed() and InterfaceError text. InternalClientError inherits from a different exception hierarchy and is never matched. The engine's handle_dbapi_exception() in engine/base.py calls dialect.is_disconnect() and only invalidates the connection if it returns True. When it returns False, the connection is re-checked in via pool's finalize_fairy() in pool/base.py. This only terminates connections flagged via InvalidationError or is_disconnect.... Pre-ping (pool/impl.py QueuePool._do_pre_ping()) runs a test query but since the TCP socket is still open, it passes the ping, and the corrupted asyncpg protocol state comes on the next real query.
+
+Q3: What does this codebase do?
+
+SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL. SQLAlchemy provides a full suite of well known enterprise-level persistence patterns, designed for efficient and high-performing database access, adapted into a simple and Pythonic domain language.
+Major SQLAlchemy features include:
+An industrial strength ORM, built from the core on the identity map, unit of work, and data mapper patterns. These patterns allow transparent persistence of objects using a declarative configuration system. Domain models can be constructed and manipulated naturally, and changes are synchronized with the current transaction automatically.
+A relationally-oriented query system, exposing the full range of SQL's capabilities explicitly, including joins, subqueries, correlation, and most everything else, in terms of the object model. Writing queries with the ORM uses the same techniques of relational composition you use when writing SQL. While you can drop into literal SQL at any time, it's virtually never needed.
+
+Q4:  What issues or gaps does the codebase have, and how would adeveloper get started on solving them?
+
+The gap is that the asyncpg dialect's is_disconnect() method (asyncpg.py:is_disconnect) has an incomplete exception type check. It catches InterfaceError which maps to asyncpg's PostgresError-based exceptions but not InternalClientError which is raised when asyncpg's internal protocol state machine detects corruption. This is obviouslt different from a database-level error. This error only shows up when PostgreSQL terminates a session during a transaction and the asyncpg client reads the termination on the next operation... the internal buffer state returns a InternalClientError instead of the standard InterfaceError.
+A L4/5 SWE should start by writing a failing test that:
+1\ connects via asyncpg through SQLAlchemy
+2\ simulates a server-side session kill via pg_terminate_backend or setting idle_in_transaction_session_timeout low
+3\ executes a query against the terminated connection
+4\ confirms the connection is invalidated and not returned to the pool.... then trace through asyncpg.py:is_disconnect() to confirm InternalClientError is not caught, and add isinstance(e, self.dbapi.InternalClientError) alongside the existing InterfaceError check.
+5\ verify the fix propagates correctly through engine/base.py Connection._handle_dbapi_exception() and pool/base.py_finalize_fairy()
+
+
+--- Model A
 
 Model Name:
 Start:
@@ -48,7 +78,7 @@ Prompt A4 - Implement
 
 Implement the minimal fix now that you have traced the path.
 
-Prompt A5 - Code review and behavioural findings
+Prompt A5 - Code review
 
 Please review the code generated for logic, performance and security bugs. produce a report in MD format with findings rated by critical, high and low. make sure each finding explicitly states the filename, filepath and line number and the suggested fix.
 
@@ -116,7 +146,7 @@ isinstance(e, self.dbapi.InternalClientError), alongside the current
 InterfaceError branch. Keep it to the dialect - do not change engine/base.py or
 pool/*.py unless you can justify why.
 
-Prompt B5 - Code review and behavioural findings
+Prompt B5 - Code review
 
 Please review the code generated for logic, performance and security bugs. produce a report in MD format with findings rated by critical, high and low. make sure each finding explicitly states the filename, filepath and line number and the suggested fix.
 

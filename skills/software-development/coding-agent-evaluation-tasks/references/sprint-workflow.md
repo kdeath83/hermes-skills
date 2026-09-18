@@ -5,7 +5,9 @@ Sprint work: run two blinded Claude models in parallel on one assigned pre-work 
 ## Prerequisites (Phase 0)
 
 - Claude Code installed and current (`claude update`). Model runs happen inside Docker containers — Docker must be installed and running; init.py blocks setup without it.
-- GitHub SSH key configured (project Appendix B).
+- GitHub SSH key configured (project Appendix B). Generate it with the Mercor expert email as the comment and register it on the account the sprint clones as. Registration needs the gh admin:public_key scope: `gh auth refresh -h github.com -s admin:public_key` (browser approval), then `gh ssh-key add <key>.pub --title "<label>"`.
+- Verify the NEW key standalone: `ssh -i <key> -o IdentitiesOnly=yes -T git@github.com` plus a `git ls-remote` against a public repo. An unregistered key fails even for public repos, while a plain `ssh -T` can succeed via an older registered key — which masks the problem. Write the new key to its own file; never overwrite an existing id_ed25519.
+- Pre-launch check, all must pass: Docker daemon running, `claude --version` current, `python3 --version` >= 3.7, ANTHROPIC_API_KEY and ANTHROPIC_AUTH_TOKEN unset and absent from shell profiles, SSH key authenticating standalone.
 - Python 3.7+.
 - Insightful running for the ENTIRE task, setup through final submission. Do not start before it is active; do not stop it before submitting.
 - Slack: #announcements (deadlines), #code-preferences-help (questions, edge cases), #general (payout). Task assignment arrives by DM from the bot.
@@ -50,4 +52,8 @@ $85/hour + $200 bonus per accepted task. Quality, throughput, and time logs are 
 ## Where things live
 
 - Project work files: ~/Documents/PROJECT C/
-- Full troubleshooting: project Appendix A (setup) and Appendix B (GitHub SSH key)
+- Full troubleshooting: project Appendix A (setup) and project Appendix B (GitHub SSH key)
+
+## Authoring these artifacts
+
+The user edits spec and prompt-flow files live while you work. Re-read the exact file immediately before any overwrite — a stale copy is refused. Prefer small targeted patches over whole-file rewrites: a large single write can time out mid-stream and lose the content. Files are plain text only: no markdown headers, no pipes, no backticks, no emoji. Do not wrap them either — leave every paragraph as one long line exactly as written, including the Q1-Q4 block and each prompt block; the user reads with soft wrap off.

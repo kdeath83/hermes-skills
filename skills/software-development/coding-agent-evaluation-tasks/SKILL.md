@@ -255,7 +255,8 @@ Run structure: blind A/B of two blinded Claude models, each a separate Claude Co
 Guidance docs are multi-tab Google Docs. Read one tab as plain text with: curl -sL '<docUrl>/export?format=txt&tab=<tabId>', where tabId is the t.<id> fragment from the share URL. Fetching the normal page URL returns only the app shell, so use the export endpoint and page through tabs one id at a time.
 
 ### Phase 2 setup (per sprint)
-- init.py in its own directory; Claude Code + Docker installed and running
+- One task at a time. Parallel tasks are not supported - finish and submit before taking another.
+- init.py in its own directory; Claude Code + Docker installed and running. Verify you can actually build and run a docker image before sprint day: model runs now happen inside containers so the two agents cannot fight over ports or kill each other's processes.
 - Unset ANTHROPIC_API_KEY and ANTHROPIC_AUTH_TOKEN (they override proxy login)
 - python3 init.py -> name, Mercor expert email, Task ID, clone SSH link -> one-time Okta login
 - ./claude-dev in model_a/ and model_b/ -> confirm animal code name -> DO NOT run /login
@@ -279,13 +280,15 @@ Guidance docs are multi-tab Google Docs. Read one tab as plain text with: curl -
 13 official issue types (full detail in references/behavioural-issues-reference.md):
 Code Hallucinations, Documentation Issues, Fails to Address Root Cause, False Claims of Success, File-Related Issues, Instruction Following Failures, Laziness, Overengineering, Product/Harness Issues, Tool Use Errors, Unauthorized Destructive Operations, Verbose Dialogue, Verification Failures.
 Entry = model (A/B) + issue type + verbatim quote + description + severity (Blocking/Major/Minor/Observation).
-No quota. Accuracy over volume; expect 3+ on complex tasks. Watch the mistagging pairs (False Claims vs Verification; Laziness vs Verification; Laziness vs Root Cause; Tool Use vs Hallucinations; Tool Use vs Harness; Overengineering vs File-Related).
+No minimum. Accuracy comes first, volume second - flag everything you genuinely observe and nothing you do not. A padded flag is worse than none. The quality and quantity of flags is monitored: multiple submissions with 0 flags get pulled for Quality audits. Watch the mistagging pairs (False Claims vs Verification; Laziness vs Verification; Laziness vs Root Cause; Tool Use vs Hallucinations; Tool Use vs Harness; Overengineering vs File-Related).
 
 ### Rating (Phase 4, Appendix D)
 Individual first (1-5, per model, no comparing), then head-to-head (0-7).
 Individual criteria: Task Success, Instruction Following, Interaction Quality, Code Quality, Thoroughness, Communication Quality.
 Head-to-head criteria: Overall Performance, Instruction Following, Time to Resolution, Vibe.
 Scale: 0 strong A / 1-2 moderate A / 3-4 slight or tie / 5-6 moderate B / 7 strong B.
+Time to Resolution = agent working time, not wall clock. Idle time while you were busy with the other session does not count against a model.
+Task difficulty is settled in pre-work and is no longer audited. Ratings have one job: reflect what the agents actually did. Score high where earned, low where not, and make the written feedback support the score.
 Every score needs specific written evidence (quotes, decisions, failures). Never describe how a model "felt". Do individual ratings before head-to-head.
 
 ## Accepted Conventions (do not re-flag)

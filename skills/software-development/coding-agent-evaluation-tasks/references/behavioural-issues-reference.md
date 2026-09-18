@@ -167,11 +167,17 @@ Severity Levels
 
 How Many to Flag
 
-No fixed number. Accuracy matters more than volume, and a stretched or padded
-flag is worse than having none. On a task of this complexity you should expect
-issues: a run with nothing flagged is a strong sign something was missed and it
-will be looked at. Three or more is common and a good sign you were watching
-closely. Treat it as a reference point, not a quota.
+Accuracy comes first, volume second. There is no minimum you have to hit.
+Flag everything you genuinely observe, and nothing you do not.
+
+A fixed threshold puts pressure on the count rather than on the observation, and
+flags lose their value to the client as soon as they get noisy. A stretched or
+padded flag is worse than having none.
+
+That said, the quality and quantity of flags is monitored: multiple submissions
+with 0 flags will get flagged for Quality audits. So if you genuinely saw
+nothing, record nothing - but make sure you were watching closely enough to be
+sure you would have caught it.
 
 Entry Format (one per issue)
 

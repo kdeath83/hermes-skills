@@ -64,8 +64,7 @@ fi
 command -v git >/dev/null 2>&1 && ok "git $(git --version | awk '{print $3}')" || bad "git not found"
 
 if command -v claude >/dev/null 2>&1; then
-  ok "Claude Code $(claude --version 2>/dev/null | awk '{print $1}')"
-  warn "run 'claude update' to make sure it is current"
+  ok "Claude Code $(claude --version 2>/dev/null | awk '{print $1}') (run 'claude update' periodically)"
 else
   bad "claude not found - install Claude Code"
 fi

@@ -168,7 +168,7 @@ When writing prompts for multi-turn evaluation (Project T / Taiga style), these 
 - **No bullet points or numbered lists.** Everything flows as prose. A list of items becomes a paragraph with "First," "Second," "Third."
 - **No line numbers in prompts.** Never reference specific source code line numbers (e.g., "at line 82", "line 135"). Describe behavior architecturally. Line numbers are prompt contamination. The model should discover them.
 - **No model-specific references.** Never mention "Model A" or "Model B." The prompt goes to a single model that does not know about the other.
-- **Full-line paragraphs, no manual line breaks.** Each paragraph is one long line. Let the rendering engine wrap. Do not insert hard line breaks at ~100 chars. The T4 prompt format is the canonical reference. Scope check: this applies to Project T single-model prompts only. The Project C sprint prompt-flow files are the opposite case and must be hard-wrapped at 78 columns (see Prompt-Flow File Layout). Do not carry this rule across.
+- **Full-line paragraphs, no manual line breaks.** Each paragraph is one long line. Let the rendering engine wrap. Do not insert hard line breaks at ~100 chars. The T4 prompt format is the canonical reference. This holds for Project T single-model prompts AND for every Project C file (prompt-flow and task-spec alike) — the user reads with soft wrap off and never wants hard wrapping. Do not wrap.
 - **Flowing sentences, not staccato fragments.** Use longer clauses connected with \"and\" and \"but\" rather than short, choppy sentences. Read your prompt aloud. If it sounds like a series of commands barked at a subordinate, rewrite it. If it sounds like an email to a coworker explaining what needs to happen and why, that is the right tone. Bullet points are acceptable only for structured specifications, such as endpoint definitions or mutation groups, where a list format is the clearest way to present the information.
 - **Natural, conversational framing.** Write like you are asking a coworker. Open-ended questions over numbered deliverable lists. "What do you think?" over "Do X, then Y, then Z." Use "OK, you know this code..." and "Let's also..." as transition phrases.
 - **Less prescriptive is better.** The model should choose its own approach. Frame the mechanism, ask whether the proposed fix is correct, and let the model walk the source and decide.
@@ -237,6 +237,15 @@ When the evaluation requires high token burn (100K+ per turn), layer these into 
 
 The sandbox has Python, sqlite, pip (for pure-Python packages), and standard Unix tools. It lacks Postgres, apt-get, systemd, Docker, and external network access. Never ask for these. Models will spend tokens discovering the constraint and produce less output. If Postgres behavior must be tested, ask for a behavioral model that simulates the divergence properties, not a real Postgres instance.
 
+## Local Machine Setup (macOS)
+
+- Setup script: `~/Documents/PROJECT C/setup-macos.sh` — run with no args for checks, `--install` to build `.venv` with submit.py deps. Run it in the directory where `init.py` lives.
+- `CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000` belongs in `~/.zshrc` (a script cannot persist env vars).
+- `tuspy` installs under that pip name but imports as `tusclient` — check the import name, not the package name.
+- Do not use `ssh -T git@github.com | grep ...` under `set -o pipefail`: ssh exits 1 by design when GitHub refuses shell access, so the pipeline reports failure. Capture output to a variable first.
+- Old Windows `setup.ps1` (from the earlier PC) lives in the Syncthing-synced workspace at `~/.openclaw/workspace/project c/`. It installed supabase/tuspy, Bun, Cygwin as SHELL, set the token ceiling, and nulled ANTHROPIC_API_KEY. Bun and Cygwin have no macOS equivalent and are not needed.
+- That same folder holds the earlier Project C archive: `gold_standard.txt`, `rating-guide-v2.md`, `rating-templates.md`, `reviewer feedback template.txt`, `Task Quality Guidelines for Coding Preference.txt`, and template sets for VLC / HomeAssistant / Opencut / Appsmith / OpenObserve / Idurar.
+
 ## Sprint Stage (Running the Comparison)
 
 Tasks come from the pre-work pool, assigned by the Slack/Woz bot (you do not pick). Sprint pay: $85/hr + $200 bonus per accepted task.
@@ -251,6 +260,8 @@ Guidance docs are multi-tab Google Docs. Read one tab as plain text with: curl -
 - python3 init.py -> name, Mercor expert email, Task ID, clone SSH link -> one-time Okta login
 - ./claude-dev in model_a/ and model_b/ -> confirm animal code name -> DO NOT run /login
 - Opening prompt auto-injects; let it run, do not interrupt or re-send
+- Run scripts/setup-macos.sh from the init.py directory before a task. Checks-only by default; --install also builds .venv with the submit.py deps (requests, supabase, tuspy, pyjwt[crypto], cryptography). It cannot persist env vars, so add `export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000` to ~/.zshrc by hand.
+- Two gotchas the preflight script hit while being built. Under `set -o pipefail`, never pipe a command that exits non-zero by design into grep for a pass/fail test (ssh -T git@github.com returns 1 on success) — capture its output to a variable first, then grep that. And the tuspy pip package imports as `tusclient`, so dependency checks must import tusclient; installing tuspy and then asserting `import tuspy` reports a false failure.
 
 ### Running (Phase 3)
 - Interactive: 5+ meaningful turns, min 1hr per model, hard stop 2.5hr
@@ -294,18 +305,12 @@ Stored at `~/Documents/PROJECT C/<repo>-prompt-flow.md`. The user maintains thes
 4. Seven prompts per track: 1 opening (auto-injected, identical for both), 2-4 diverge (A open-ended, B pointed at specific files), 5 code review report as MD, 6 verify with tests, 7 compile report as MD. Prompts 5-7 are worded identically across tracks.
 
 ### File formatting
-These files are read on screen and copied from, so every line must render fully. Wrap all prose at 78 columns. A paragraph left as one long line reads as truncated in most editors, and the user will reject it. Wrap mechanically rather than by hand, then strip the trailing spaces the wrapper leaves behind:
-
-    fold -s -w 78 file.md > file.wrapped
-    sed -i '' 's/[[:space:]]*$//' file.wrapped
-    mv file.wrapped file.md
-
-Short lines, blank lines and headings are untouched, so this is safe to re-run on any revision. Applies to the Q1-Q4 block as well as the prompt blocks. Keep the plain-text rule alongside it: no markdown headers, no pipes, no backticks, no emoji.
+No wrapping — see the no-wrap rule under Accepted Conventions. Every paragraph stays on one long line exactly as written, including the Q1-Q4 block and every prompt block. Never run fold, fmt, or any reflow tool over a Project C file; when rejoining a wrapped block, drop the line break and collapse the resulting double space. Plain-text rule still applies alongside it: no markdown headers, no pipes, no backticks, no emoji.
 
 ### Working convention
 When the user edits one track, mirror the identical change into the parallel track rather than re-deriving it. Keep prompt numbering and titles identical across both tracks; a mismatched title is usually an oversight, so normalise to the form from the user's most recent edit and state which direction you chose.
 
-Always re-read the file immediately before writing. The user edits these files live and saves between turns, so writes are frequently refused as stale.
+Always re-read the FULL file (no offset/limit) immediately before writing. The user edits these files live and saves between turns, so both stale writes and partial-view writes are refused. If the user says they saved an edit but the content on disk is unchanged, say so and ask rather than guessing what they meant; confirm with the file mtime plus a grep of the affected headings before acting.
 
 ## Pitfalls
 
@@ -333,6 +338,7 @@ Always re-read the file immediately before writing. The user edits these files l
 - See `references/prompt-templates.md` for pre-written prompt templates (interactive + async, multiple task types with filled examples)
 - See `references/prompt-style-cheatsheet.md` for Project T / Taiga prompt writing rules: no dashes, no backticks, no tables, natural prose, burn techniques
 - See `references/sprint-workflow.md` for sprint setup/launch/submission mechanics: init.py flow, Docker requirement, ANTHROPIC env-var gotcha, Okta login, launch commands, submission stages
+- See `scripts/setup-macos.sh` for the macOS sprint preflight (dependency checks, .venv with submit.py deps, ANTHROPIC env-var hygiene) — the macOS analogue of the old Windows setup.ps1
 ## Evaluation Phase (Sprint)
 
 Sprint runs are blind A/B comparisons of two Claude models on a task assigned from the approved pre-work pool. Run both sessions in parallel from one identical repo snapshot (model_a/, model_b/). The models run outside Studio, in your terminal; Studio holds the task under a Task ID for rating and submission.

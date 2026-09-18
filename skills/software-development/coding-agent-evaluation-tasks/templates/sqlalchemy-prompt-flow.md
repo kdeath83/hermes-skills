@@ -53,6 +53,58 @@ Prove the fix actually holds:
 - healthy connections still behave normally
 Run the relevant test suites and report what passes.
 
+Prompt A6 - Code review and behavioural findings
+
+Optional model prompt (surfaces communication quality and overconfidence):
+
+Walk me through what you changed and why. For each part, tell me where it
+could go wrong: any case where it would now invalidate a healthy connection,
+any cost it adds to the error path, and any way a connection in this state
+could still reach a live request.
+
+Then review the generated diff yourself, independently of what the model
+claimed. Cover three dimensions and record each finding as a behavioural
+issue (issue type + severity).
+
+Logic
+- Does the fix classify InternalClientError correctly without over-broadening,
+  i.e. catching unrelated exceptions and invalidating healthy connections?
+- Is the isinstance check scoped and ordered correctly?
+- Are there sibling exception types with the same gap that were missed?
+- Is the pre-ping path consistent with the new classification?
+
+Performance
+- The check runs on every DBAPI exception, so does it add real cost to the
+  error path?
+- Any extra round-trips or I/O introduced?
+- Does it avoid over-invalidating and thrashing the pool, which would hurt
+  throughput more than the bug it fixes?
+
+Security
+- A corrupted connection reused from the pool can leak state across requests
+  or tenants. Does the fix actually eliminate that?
+- Does the fix swallow or mask real errors?
+- Is anything sensitive logged, such as connection strings or bound params?
+- Could reusing a half-broken connection corrupt data rather than fail cleanly?
+
+Findings
+
+Finding 1
+Model: A
+Dimension: Logic / Performance / Security
+Issue type: <one of the 13>
+Evidence: <file and line in the generated diff>
+Severity: Blocking / Major / Minor / Observation
+
+Finding 2
+Model: A
+Dimension:
+Issue type:
+Evidence:
+Severity:
+
+(continue as needed)
+
 Observation Record - Track A
 
 Model Name:
@@ -122,6 +174,58 @@ Write the test that proves it:
 - assert the connection is invalidated, not returned to the pool
 Also confirm existing InterfaceError handling and healthy connections are
 unaffected. Run the dialect and pool suites.
+
+Prompt B6 - Code review and behavioural findings
+
+Optional model prompt (surfaces communication quality and overconfidence):
+
+Walk me through what you changed and why. For each part, tell me where it
+could go wrong: any case where it would now invalidate a healthy connection,
+any cost it adds to the error path, and any way a connection in this state
+could still reach a live request.
+
+Then review the generated diff yourself, independently of what the model
+claimed. Cover three dimensions and record each finding as a behavioural
+issue (issue type + severity).
+
+Logic
+- Does the fix classify InternalClientError correctly without over-broadening,
+  i.e. catching unrelated exceptions and invalidating healthy connections?
+- Is the isinstance check scoped and ordered correctly?
+- Are there sibling exception types with the same gap that were missed?
+- Is the pre-ping path consistent with the new classification?
+
+Performance
+- The check runs on every DBAPI exception, so does it add real cost to the
+  error path?
+- Any extra round-trips or I/O introduced?
+- Does it avoid over-invalidating and thrashing the pool, which would hurt
+  throughput more than the bug it fixes?
+
+Security
+- A corrupted connection reused from the pool can leak state across requests
+  or tenants. Does the fix actually eliminate that?
+- Does the fix swallow or mask real errors?
+- Is anything sensitive logged, such as connection strings or bound params?
+- Could reusing a half-broken connection corrupt data rather than fail cleanly?
+
+Findings
+
+Finding 1
+Model: B
+Dimension: Logic / Performance / Security
+Issue type: <one of the 13>
+Evidence: <file and line in the generated diff>
+Severity: Blocking / Major / Minor / Observation
+
+Finding 2
+Model: B
+Dimension:
+Issue type:
+Evidence:
+Severity:
+
+(continue as needed)
 
 Observation Record - Track B
 

@@ -27,6 +27,21 @@ expiry loop recalculates based on when it applied the raft log entry, not when
 the lease was originally granted. Fix it so leases survive leader transitions
 correctly.
 
+Task Goal
+
+Fix lease promotion so that leases survive leader elections within their
+original TTL. When a new leader is elected, promoted leases must expire at
+their original absolute expiry, not at a time recalculated from the raft apply
+moment. Leases must still expire normally once their full TTL elapses, and
+lease behaviour without a leader change must not change.
+
+Success criteria:
+1. A lease created with TTL N still has approximately N remaining after a
+   leader election, not N minus the election delay
+2. Leases still expire at approximately the correct time once their TTL elapses
+3. Existing lease tests pass
+4. Code compiles
+
 Rationale 1: Why would frontier models struggle with this?
 
 The bug crosses the raft state machine boundary into the lease expiry subsystem.

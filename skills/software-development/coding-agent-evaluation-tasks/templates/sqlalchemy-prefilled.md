@@ -28,6 +28,22 @@ across like six files. Trace the error recovery path and add
 InternalClientError to disconnect detection. Need a fix that catches this
 without breaking existing InterfaceError handling.
 
+Task Goal
+
+Fix the asyncpg dialect so that InternalClientError is treated as a fatal
+disconnect. When PostgreSQL terminates a session and asyncpg raises this
+exception, the connection must be invalidated and removed from the pool rather
+than returned to it. Existing InterfaceError handling must stay unchanged, and
+connection pooling behaviour for healthy connections must not regress.
+
+Success criteria:
+1. A connection that raises InternalClientError is invalidated, not returned
+   to the pool
+2. pool_pre_ping does not accept a connection left in a corrupted asyncpg
+   protocol state
+3. Existing InterfaceError disconnect handling is unchanged
+4. Asyncpg dialect test suite passes; code runs
+
 Rationale 1: Why would frontier models struggle with this?
 
 The bug crosses four layers. The asyncpg dialect classifies errors, the engine

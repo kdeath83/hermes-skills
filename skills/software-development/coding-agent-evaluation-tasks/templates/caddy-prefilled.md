@@ -28,6 +28,21 @@ Trace the path from CLI flag to upstream dial. Find where the https scheme gets
 dropped. Fix should be small - scheme extraction works, something after it in
 the pipeline loses the plot.
 
+Task Goal
+
+Fix the reverse proxy so that an https:// upstream is actually reached over
+HTTPS. When caddy reverse-proxy is started with --to https://..., requests must
+be sent over TLS rather than silently downgraded to plain HTTP. The fix must
+stay minimal and must not change behaviour for http:// upstreams.
+
+Success criteria:
+1. Running the reverse-proxy command with --to https://... produces a config
+   where HTTPTransport.TLS is populated
+2. Upstream requests go over HTTPS for https:// upstreams and plain HTTP for
+   http:// upstreams
+3. Existing reverse proxy tests pass
+4. Code compiles
+
 Rationale 1: Why would frontier models struggle with this?
 
 The bug sits between Caddy's CLI command builder and its reverse proxy

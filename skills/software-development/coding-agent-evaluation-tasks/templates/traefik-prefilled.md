@@ -26,6 +26,23 @@ get the 503 fallback without the multi-second buildup.
 
 Chain is on an HTTP router via file provider config.
 
+Task Goal
+
+Fix the retry middleware so that when the circuit breaker is open, the client
+receives the configured 503 fallback immediately instead of after repeated
+retry attempts. After the fix, retry must not fire additional attempts against
+an open circuit breaker, while still retrying normally for genuine backend
+errors when the breaker is closed. The middleware chain order and the circuit
+breaker's behaviour must both stay unchanged.
+
+Success criteria:
+1. With Retry before CircuitBreaker, once the breaker opens the client gets
+   the fallback 503 within a single breaker response window, with no retry storm
+2. When the breaker is closed and the backend returns a retryable status, retry
+   still works as before
+3. Existing retry and circuit breaker test suites pass
+4. Code compiles
+
 Rationale 1: Why would frontier models struggle with this?
 
 The middleware chain wraps handlers inside each other using the alice package.

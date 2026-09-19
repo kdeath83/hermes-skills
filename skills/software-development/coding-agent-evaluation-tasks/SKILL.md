@@ -239,9 +239,16 @@ The sandbox has Python, sqlite, pip (for pure-Python packages), and standard Uni
 
 ## Local Machine Setup (macOS)
 
-- Setup script: `~/Documents/PROJECT C/setup-macos.sh` — run with no args for checks, `--install` to build `.venv` with submit.py deps. Run it in the directory where `init.py` lives.
+- Pull a FRESH init.py every sprint. Reusing an old file risks lost work - the format changes between sprints (the current one is 636 lines vs 375 in June, needs Python 3.9+, and adds Docker checks).
+- init.py must run from an EMPTY folder. On first run it accepts only `init.py`, `.DS_Store`, `__pycache__` and hard-fails otherwise. It then writes a `.codeprefs-init` marker so later runs skip the check.
+- The folder name must match `^[A-Za-z0-9][A-Za-z0-9_.-]*$` because it becomes the Docker container name. No spaces, no parentheses - use the Task ID alone, e.g. `~/52027119`.
+- Order matters: run `init.py` BEFORE creating a venv. The empty-folder check runs first, so a pre-existing `.venv` makes init refuse. init.py offers to build the venv itself.
+- Requirements it hard-checks: Python 3.9+, Docker daemon reachable, privileged containers permitted (`docker run --rm --privileged alpine:3 df -m /`), and at least 20 GiB free inside Docker's store.
+- Start both lanes with `./claude-dev` in model_a/ and model_b/. No `/login`, no `/model` switching, no changing reasoning effort, leave thinking on.
+- Setup script: `~/Documents/PROJECT C/setup-macos.sh` — run with no args for checks, `--install` to build `.venv` with submit.py deps. Use `--install` outside the task folder only; inside it, let init.py make the venv.
 - `CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000` belongs in `~/.zshrc` (a script cannot persist env vars).
 - `tuspy` installs under that pip name but imports as `tusclient` — check the import name, not the package name.
+- Every behavioral flag needs a transcript quote of 15-20+ words.
 - Do not use `ssh -T git@github.com | grep ...` under `set -o pipefail`: ssh exits 1 by design when GitHub refuses shell access, so the pipeline reports failure. Capture output to a variable first.
 - Old Windows `setup.ps1` (from the earlier PC) lives in the Syncthing-synced workspace at `~/.openclaw/workspace/project c/`. It installed supabase/tuspy, Bun, Cygwin as SHELL, set the token ceiling, and nulled ANTHROPIC_API_KEY. Bun and Cygwin have no macOS equivalent and are not needed.
 - That same folder holds the earlier Project C archive: `gold_standard.txt`, `rating-guide-v2.md`, `rating-templates.md`, `reviewer feedback template.txt`, `Task Quality Guidelines for Coding Preference.txt`, and template sets for VLC / HomeAssistant / Opencut / Appsmith / OpenObserve / Idurar.

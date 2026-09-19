@@ -129,12 +129,14 @@ fi
 if [ -f ./.codeprefs-init ] || [ -f ./manifest.json ]; then
   ok "folder already initialised for a task"
 else
-  FOREIGN=$(ls -1A . 2>/dev/null | grep -vE '^(init\.py|\.DS_Store|__pycache__)$' | grep -v '^\.venv$' | head -5)
+  FOREIGN=$(ls -1A . 2>/dev/null | grep -vE '^(init\.py|\.DS_Store|__pycache__)$' | head -5)
   if [ -n "$FOREIGN" ]; then
     bad "folder must be empty on first run - found: $(printf '%s' "$FOREIGN" | tr '\n' ' ')"
     echo "         make a new empty folder (named after the Task ID) and put init.py there"
   else
     ok "folder is empty and ready for a first run"
+    echo "         NOTE: run init.py BEFORE creating .venv - init only accepts init.py,"
+    echo "               .DS_Store and __pycache__ on the first run, and it builds the venv itself"
   fi
 fi
 if [ -f "./init.py" ]; then

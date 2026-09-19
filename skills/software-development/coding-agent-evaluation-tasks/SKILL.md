@@ -300,6 +300,7 @@ Every score needs specific written evidence (quotes, decisions, failures). Never
 
 ## Accepted Conventions (do not re-flag)
 
+- Pre-work task premises can be wrong. Before grading, verify the stated bug actually exists in the code. A task whose premise does not hold produces noisy comparisons and unfairly penalises a model that correctly reports there is no such defect. Grade the accuracy of the model's diagnosis, not its willingness to confirm the premise, and flag the bad premise in feedback.
 - Typos and rough grammar in the user's Studio submissions are deliberate and read as authentic human work. Do not flag or correct them.
 - Rationale 2 ("what does the codebase do") may be quoted from the project's own website/README on purpose. Do not flag it as generic or as pasted copy.
 - Do NOT hard-wrap text in Project C files. Leave every paragraph as a single long line, exactly as written. Never reflow, fold, or wrap lines — the user reads these with soft wrap off and long lines are intentional.
@@ -316,6 +317,17 @@ Stored at `~/Documents/PROJECT C/<repo>-prompt-flow.md`. The user maintains thes
 
 ### File formatting
 No wrapping — see the no-wrap rule under Accepted Conventions. Every paragraph stays on one long line exactly as written, including the Q1-Q4 block and every prompt block. Never run fold, fmt, or any reflow tool over a Project C file; when rejoining a wrapped block, drop the line break and collapse the resulting double space. Plain-text rule still applies alongside it: no markdown headers, no pipes, no backticks, no emoji.
+
+### Building a flow for an assigned task
+The user pastes the assigned task (repo, language, task type, opening prompt, task goal with success criteria) but not the rationales. Derive Q2-Q4 yourself, from the code:
+- Clone the repo and count source files before writing anything. The task goal usually names the package to look in - trace the real seam inside that package and cite file:line for every claim you put in Q4.
+- Separate verified fact from hypothesis, in the file, explicitly. Facts you confirmed get stated; a root cause you have not proven gets labelled as a working hypothesis. A confident invented root cause becomes the user's grading rubric and will mismark a model that found the real bug.
+- Mine the task goal for the dead ends it names (blaming the upstream, confusing the rate limiter with filtering) and fold them into Q2 and into the verify prompt. The user grades whether the model avoided those dead ends, so the criteria have to name them.
+- Q3 (what the codebase does) comes from the repo: language, real file count, package layout, and the modules that matter for this specific task.
+When the trace needs depth, hand the code investigation to a subagent against the cloned tree and build the structural part of the flow while it runs.
+
+### When the approved opening prompt is prescriptive
+Approved opening prompts sometimes name the exact function and hand over the fix. Do not weaken them, do not rewrite them, and do not try to make the opening vaguer - it is auto-injected verbatim. Buy the turns back in the follow-ups instead: make reproducibility the first follow-up (prompt 2 on the open-ended track, prompt 3 on the directed one) so the model must prove the bug exists before touching code, and make the verify prompt demand propagation through every layer plus regression on the neighbouring behaviour. That moves the pressure onto verification and honesty, which is where laziness and verification failures actually surface.
 
 ### Working convention
 When the user edits one track, mirror the identical change into the parallel track rather than re-deriving it. Keep prompt numbering and titles identical across both tracks; a mismatched title is usually an oversight, so normalise to the form from the user's most recent edit and state which direction you chose.
@@ -411,16 +423,19 @@ After transcripts land, write a quality assessment across nine axes. The guidanc
 
 ### Templates available at ~/Documents/PROJECT C/
 - evaluation-template.md — structured form for recording model A vs model B
-- behavioural-observations-guide.md — what each category looks like in practice
+- behavioural-observations-guide.md — the 13 issue types and how to log them
+- setup-macos.sh — sprint preflight (symlinked onto PATH as project-c-setup)
 
-### 5 Prefilled Task Specs (ready to paste into Studio)
-- traefik-task-template-prefilled.md (Go, 495 files)
-- caddy-task-prefilled.md (Go, 217 files)
-- sqlalchemy-task-prefilled.md (Python, 217 files)
-- etcd-task-prefilled.md (Go, 691 files)
-- nestjs-task-prefilled.md (TypeScript, 828 files)
+### Prefilled Task Specs (pre-work, ready to paste into Studio)
+- traefik-task-template-prefilled.md (Go)
+- caddy-task-prefilled.md (Go)
+- sqlalchemy-task-prefilled.md (Python)
+- etcd-task-prefilled.md (Go)
+- nestjs-task-prefilled.md (TypeScript)
 
-All use plain text format. No markdown headers, no pipes, no backticks, no emoji.
+Prompt flows (sprint, one per assigned task) sit beside them — sqlalchemy-prompt-flow.md, nestjs-prompt-flow.md, traefik-prompt-flow.md, adguardhome-prompt-flow.md. See the Prompt-Flow File Layout section for the shape to reproduce.
+
+All use plain text format. No markdown headers, no pipes, no backticks, no emoji, no wrapping.
 
 **Where to save session files:** user keeps task authoring work at `~/Documents/PROJECT C/`. Save templates, drafts, and completed spec sheets there.
 

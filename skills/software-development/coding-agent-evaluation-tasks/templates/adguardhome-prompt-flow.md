@@ -63,7 +63,7 @@ Before implementing, confirm you can reproduce it. Configure two clients, one wi
 
 Prompt B4 - Implement the specific fix
 
-Fix the settings lifecycle so one request's per-client filtering settings cannot affect another's, and so the response-time path uses the settings belonging to the request that is being answered. Keep the client resolution order intact and do not touch the upstream path or the rate limiter unless you can justify why.
+Implement a fix for the defect you reproduced. Keep the client resolution order intact and do not touch the upstream path or the rate limiter unless you can justify why. State what the fix changes and why that stops the failures.
 
 Prompt B5 - Code review
 

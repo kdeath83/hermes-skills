@@ -56,7 +56,7 @@ echo "2. Prerequisites"
 if command -v python3 >/dev/null 2>&1; then
   PYV=$(python3 -c 'import sys;print("%d.%d"%sys.version_info[:2])')
   PYN=$(python3 -c 'import sys;print(sys.version_info[0]*100+sys.version_info[1])')
-  if [ "$PYN" -ge 307 ]; then ok "python3 $PYV"; else bad "python3 $PYV (need 3.7+)"; fi
+  if [ "$PYN" -ge 309 ]; then ok "python3 $PYV"; else bad "python3 $PYV (need 3.9+)"; fi
 else
   bad "python3 not found"
 fi
@@ -118,6 +118,25 @@ fi
 # ------------------------------------------------------------- 5. task folder
 echo
 echo "5. Task folder"
+# New init.py rules: the folder must be empty on first run, and its name must be
+# valid as a Docker container name (letters, digits, '_', '.', '-').
+HERE=$(basename "$(pwd)")
+if printf '%s' "$HERE" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9_.-]*$'; then
+  ok "folder name '$HERE' is valid for container naming"
+else
+  bad "folder name '$HERE' has characters Docker rejects - rename (e.g. the task id alone)"
+fi
+if [ -f ./.codeprefs-init ] || [ -f ./manifest.json ]; then
+  ok "folder already initialised for a task"
+else
+  FOREIGN=$(ls -1A . 2>/dev/null | grep -vE '^(init\.py|\.DS_Store|__pycache__)$' | grep -v '^\.venv$' | head -5)
+  if [ -n "$FOREIGN" ]; then
+    bad "folder must be empty on first run - found: $(printf '%s' "$FOREIGN" | tr '\n' ' ')"
+    echo "         make a new empty folder (named after the Task ID) and put init.py there"
+  else
+    ok "folder is empty and ready for a first run"
+  fi
+fi
 if [ -f "./init.py" ]; then
   ok "init.py present in this directory"
 else

@@ -1,7 +1,7 @@
 Behavioral Issues Reference - Project C Sprint
 
 Log an entry whenever one of these issues shows up in a run. Each entry needs:
-model (A or B), issue type, a direct transcript quote, a description, and a severity.
+model (A or B), issue type, a direct transcript quote, a description, and a severity. Every flag needs a transcript quote of 15-20+ words.
 
 Log in real time while the agents run. Logs scroll away and context gets
 compacted, so keep Studio open and tag issues as they happen.
@@ -183,7 +183,7 @@ Entry Format (one per issue)
 
 Model: A or B
 Issue type: <from the 13 above>
-Transcript quote: <direct quote, verbatim>
+Transcript quote: <direct quote, verbatim, 15-20+ words>
 Description: <what happened, with context>
 Severity: Blocking / Major / Minor / Observation
 

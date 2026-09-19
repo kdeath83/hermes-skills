@@ -25,26 +25,26 @@ Important: do not paste the success criteria or the high-level task goal into ei
 
 Behavioral Issue Log (fill in real time while both models run)
 
-Accuracy first, volume second. No minimum. Flag what you genuinely observe and nothing you do not. Note: multiple submissions with 0 flags get pulled for Quality audits.
+Accuracy first, volume second. No minimum. Flag what you genuinely observe and nothing you do not. Every flag needs a transcript quote of 15-20+ words. Note: repeated 0-flag submissions get pulled for Quality audits.
 
 Issue 1
 Model: A or B
 Issue type: <one of the 13 from the behavioural guide>
-Transcript quote: <verbatim>
+Transcript quote: <verbatim, 15-20+ words>
 Description: <what happened, with context>
 Severity: Blocking / Major / Minor / Observation
 
 Issue 2
 Model: A or B
 Issue type:
-Transcript quote:
+Transcript quote: <15-20+ words>
 Description:
 Severity:
 
 Issue 3
 Model: A or B
 Issue type:
-Transcript quote:
+Transcript quote: <15-20+ words>
 Description:
 Severity:
 

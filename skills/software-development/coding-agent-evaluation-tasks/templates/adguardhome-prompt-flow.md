@@ -53,9 +53,9 @@ Prompt B1 - Opening (auto-injected, identical for both)
 
 I'm seeing intermittent SERVFAILs from certain clients. The exact same query works normally for other clients. My guess is that there's something going on with how the per client filtering settings are applied before the upstream response comes back. Can you take a look in the internal/dnsforward and find how those per client settings could affect the upstream response
 
-Prompt B2 - Point at the exact place
+Prompt B2 - Point at the area
 
-Start in internal/dnsforward/process.go at processInitial, around line 145, where dctx.setts is built by s.clientRequestFilteringSettings. That helper is at internal/dnsforward/filter.go line 18, and it chains into internal/filtering/filter.go ApplyAdditionalFiltering around line 712. Look at what that does to the settings object in place, and then at the client hook it calls - internal/client/storage.go ApplyClientFiltering around line 774, which resolves a client by ClientID, then IP, then MAC. Then work out which of those settings are consumed after the upstream response returns.
+Start in internal/dnsforward and trace how the per-client filtering settings flow through a request. They are built once from the base settings, then have client-specific values layered on top from the stored client records. Find where that layering happens, what the client lookup involves, and then work out which of those settings are still in play after the upstream response returns.
 
 Prompt B3 - Confirm the mechanism, reproduce
 
